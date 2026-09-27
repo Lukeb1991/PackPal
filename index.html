@@ -1,0 +1,1332 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PackPal: pack smarter, travel lighter</title>
+<meta name="description" content="PackPal works out what to pack for your holiday from the weather, your plans and your baggage allowance. Pack smarter. Travel lighter.">
+<meta name="theme-color" content="#F4EEE2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1C1F" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="PackPal">
+<meta property="og:description" content="Pack smarter. Travel lighter. A packing list built from your destination's weather, your plans and your baggage allowance.">
+<meta property="og:type" content="website">
+<!-- Swap og-image.png for the full URL once live, e.g. https://YOUR-USERNAME.github.io/packpal/og-image.png -->
+<meta property="og:image" content="og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="PackPal: pack smarter, travel lighter. A packing list for Antalya, 100% packed.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4EEE2; --paper:#FFFBF4; --ink:#25262A; --muted:#6A655C; --line:#E2D8C6;
+  --accent:#2F4FE0; --accent-ink:#FFFFFF; --accent-soft:#E3E7FB;
+  --warn:#C8372C; --warn-soft:#F8E1DC; --ok:#2E7D4F; --ok-soft:#DDEFE3; --amber:#B97C0B;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#1B1C1F; --paper:#26272B; --ink:#F1EADD; --muted:#A9A296; --line:#3B3C42;
+    --accent:#8197FF; --accent-ink:#0F1538; --accent-soft:#2B3262;
+    --warn:#FF7D70; --warn-soft:#402523; --ok:#6CCB91; --ok-soft:#1F3A2A; --amber:#EAB64E;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1B1C1F; --paper:#26272B; --ink:#F1EADD; --muted:#A9A296; --line:#3B3C42;
+  --accent:#8197FF; --accent-ink:#0F1538; --accent-soft:#2B3262;
+  --warn:#FF7D70; --warn-soft:#402523; --ok:#6CCB91; --ok-soft:#1F3A2A; --amber:#EAB64E;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 Figtree,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:720px;margin:0 auto;padding:28px 16px 64px}
+h1,h2,h3{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;line-height:1.1}
+h2{font-size:24px;font-weight:800;letter-spacing:-.01em;margin-bottom:12px}
+h3{font-size:17px;font-weight:600;margin:20px 0 8px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hidden{display:none!important}
+.fine{font-size:14px;color:var(--muted);margin:10px 0 0}
+.hint{font-size:14px;color:var(--muted);font-weight:400}
+
+/* Brand */
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.brand .case{font-size:44px;line-height:1}
+.brand h1{font-size:clamp(46px,12vw,76px);font-weight:800;letter-spacing:-.035em}
+.tagline{font:600 clamp(19px,4.6vw,24px)/1.25 "Bricolage Grotesque",Figtree,sans-serif;margin:0 0 6px}
+.lede{color:var(--muted);margin:0 0 24px;max-width:48ch}
+
+/* Trips */
+.trips{margin:0 0 20px}
+.trips-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.trips-head h2{margin:0;font-size:20px}
+.trip-row{display:flex;gap:8px;margin-bottom:8px}
+.trip-open{flex:1;min-width:0;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer}
+.trip-open[aria-current="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.trip-open b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trip-open span{font-size:14px;color:var(--muted)}
+.trip-open .ok{color:var(--ok);font-weight:600}
+.trip-del{flex:none;min-width:48px;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:0 12px;cursor:pointer;color:var(--muted);font-size:18px}
+.trip-del.arm{background:var(--warn);border-color:var(--warn);color:#fff;font-size:14px;font-weight:700}
+
+/* The luggage tag form */
+.tag{position:relative;background:var(--paper);border-radius:10px 22px 22px 10px;padding:26px 20px 22px 44px;border:1px solid var(--line)}
+.tag::before{content:"";position:absolute;left:14px;top:28px;width:16px;height:16px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 3px var(--accent)}
+.tag::after{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--accent);border-radius:10px 0 0 10px}
+.field{margin-bottom:18px}
+.lbl,.field > label{display:block;font-weight:600;margin-bottom:6px}
+input[type=text],input[type=date],input[type=number],select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);min-height:48px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:9px 15px;cursor:pointer;min-height:42px}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.check{display:flex;gap:10px;align-items:flex-start;margin:8px 0;cursor:pointer}
+.check input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+.go{width:100%;border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:18px;padding:16px;cursor:pointer;margin-top:6px;min-height:56px}
+.go:disabled{opacity:.6;cursor:progress}
+.err{color:var(--warn);font-size:15px;margin:10px 0 0}
+.ghost{border:1px solid var(--line);background:transparent;border-radius:10px;padding:10px 14px;cursor:pointer;min-height:44px}
+.row-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+
+section.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:20px}
+
+/* Weather */
+.place{font-size:15px;color:var(--muted);margin:-6px 0 12px}
+.wxstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:0 0 12px}
+.wxstat{background:var(--bg);border-radius:12px;padding:10px 12px}
+.wxstat b{display:block;font:800 24px/1.1 "Bricolage Grotesque",Figtree,sans-serif}
+.wxstat span{font-size:14px;color:var(--muted)}
+.basis{font-size:14px;color:var(--muted);background:var(--accent-soft);border-radius:8px;padding:8px 12px;margin:10px 0 14px}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+.day{flex:none;width:76px;text-align:center;border:1px solid var(--line);border-radius:12px;padding:10px 4px;scroll-snap-align:start;background:var(--bg)}
+.day .d{font-size:13px;color:var(--muted)}
+.day .i{font-size:24px;line-height:1.3}
+.day .t{font-weight:700}
+.day .t span{font-weight:400;color:var(--muted)}
+.day .r{font-size:12px;color:var(--accent)}
+.impact{list-style:none;margin:6px 0 0;padding:0}
+.impact li{padding:6px 0;display:flex;gap:10px}
+.band{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.loading{color:var(--muted);font-style:italic}
+
+/* Progress */
+.score{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.score b{font:800 clamp(44px,12vw,64px)/1 "Bricolage Grotesque",Figtree,sans-serif;letter-spacing:-.03em}
+.score span{font-size:18px;color:var(--muted)}
+.counts{display:flex;flex-wrap:wrap;gap:8px 18px;margin:12px 0 16px;font-size:15px}
+.counts span{display:inline-flex;align-items:center;gap:7px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.dot.g{background:var(--ok)}.dot.y{background:var(--amber)}.dot.r{background:var(--warn)}
+.catbar{display:grid;grid-template-columns:minmax(90px,38%) 1fr 44px;gap:10px;align-items:center;font-size:15px;margin:7px 0}
+.catbar .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.catbar .pc{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.track{height:10px;background:var(--bg);border-radius:5px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--accent);border-radius:5px;transition:width .3s}
+.track i.full{background:var(--ok)}
+
+/* Bags */
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:-4px 0 4px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+.sw.p{background:var(--accent)}
+.sw.s{background:repeating-linear-gradient(135deg,var(--accent-soft) 0 3px,transparent 3px 6px);border:1px solid var(--accent)}
+.bag{margin:16px 0}
+.bag-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.bag-name{font-weight:700}
+.bag-kg{font-variant-numeric:tabular-nums;color:var(--muted);font-size:15px}
+.bag-kg b{color:var(--ink)}
+.bar{height:22px;border-radius:6px;background:var(--bg);border:1px solid var(--line);margin-top:6px;overflow:hidden;position:relative}
+.bar i{position:absolute;left:0;top:0;bottom:0;transition:width .4s ease}
+.bar .plan{background:repeating-linear-gradient(135deg,var(--accent-soft) 0 6px,transparent 6px 12px);border-right:2px solid var(--accent)}
+.bar .packed{background:var(--accent)}
+.bag.over .bar .packed{background:var(--warn)}
+.bag.over .bar .plan{border-right-color:var(--warn)}
+.bag.over .bag-kg b{color:var(--warn)}
+.bag-sub{font-size:13px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+.tips{background:var(--warn-soft);border-radius:10px;padding:12px 14px;margin-top:12px;font-size:15px}
+.tips ul{margin:6px 0 0;padding-left:20px}
+
+/* List */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:4px}
+.seg button{border:0;background:transparent;padding:8px 14px;cursor:pointer;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+ul.items{list-style:none;margin:0;padding:0}
+ul.items li{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+ul.items li:last-child{border-bottom:0}
+ul.items input[type=checkbox]{width:22px;height:22px;accent-color:var(--ok);margin:2px 0 0;flex:none;cursor:pointer}
+.it{flex:1;min-width:0}
+.it .nm{font-weight:500;cursor:pointer;display:block}
+.it .nt{font-size:13px;color:var(--muted)}
+li.done .it .nm{text-decoration:line-through;color:var(--muted)}
+.ess{color:var(--warn);font-size:12px;font-weight:700;margin-left:6px;white-space:nowrap}
+li.done .ess{color:var(--muted)}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:7px}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.step button{border:0;background:var(--bg);width:34px;height:32px;cursor:pointer;font-size:18px;line-height:1}
+.step output{min-width:30px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.where{font-size:12px;font-weight:600;border-radius:6px;padding:4px 8px;white-space:nowrap}
+.w-hold{background:var(--accent-soft);color:var(--accent)}
+.w-cabin{background:var(--ink);color:var(--bg)}
+.w-under{border:1px solid var(--line);color:var(--muted)}
+.w-wear{border:1px dashed var(--muted);color:var(--muted)}
+.buy{border:1px solid var(--line);background:transparent;border-radius:6px;padding:3px 8px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);min-height:28px}
+.buy[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#fff}
+.rm{flex:none;border:0;background:transparent;color:var(--muted);width:36px;height:36px;margin:-6px -8px -6px 0;border-radius:8px;cursor:pointer;font-size:22px;line-height:1}
+.rm:hover{background:var(--bg);color:var(--warn)}
+.addbox{margin-top:22px;padding:16px;border-radius:14px;background:var(--bg)}
+.addbox h3{margin:0 0 12px}
+.addgrid{display:grid;grid-template-columns:1fr 88px;gap:10px}
+.addgrid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.mini{display:block;font-size:14px;font-weight:600;margin-bottom:4px}
+.addbox input,.addbox select{background:var(--paper)}
+.addbtn{margin-top:12px;border:0;border-radius:10px;background:var(--ink);color:var(--bg);font-weight:700;padding:12px 18px;cursor:pointer;min-height:48px}
+
+/* Don't pack / shopping / departure */
+.nopack{list-style:none;margin:0;padding:0}
+.nopack li{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.nopack li:last-child{border-bottom:0}
+.nopack .x{color:var(--warn);font-weight:800;flex:none;width:18px;text-align:center}
+.nopack b{font-weight:600}
+.nopack span{display:block;font-size:14px;color:var(--muted)}
+.dflist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+.dflist button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:transparent;border:0;padding:8px 0;cursor:pointer}
+.dflist button[aria-pressed="true"] .t{color:var(--muted);text-decoration:line-through}
+@media (max-width:420px){.dflist{grid-template-columns:1fr}.tag{padding-left:36px}.tag::before{left:10px}}
+
+/* Finish */
+.finish{margin-top:20px}
+.forget{margin-top:14px;border:2px solid var(--warn);border-radius:14px;padding:16px;background:var(--warn-soft)}
+.forget h3{margin:0 0 8px}
+.forget ul{margin:0 0 12px;padding-left:0;list-style:none}
+.forget li{padding:3px 0}
+.forget .row-actions{margin-top:8px}
+.forget .primary{border:0;background:var(--ink);color:var(--bg);border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer;min-height:44px}
+
+/* Complete page */
+.done-card{overflow:hidden}
+.stamp{display:inline-block;font:800 22px/1 "Bricolage Grotesque",Figtree,system-ui,sans-serif;color:var(--ok);border:3px solid var(--ok);border-radius:8px;padding:7px 14px 6px;transform:rotate(-6deg);animation:stamp .55s cubic-bezier(.2,1.5,.4,1) .1s both;text-align:center}
+.stamp small{display:block;font:600 11px/1.2 Figtree,system-ui,sans-serif;margin-top:4px;letter-spacing:.02em}
+@keyframes stamp{from{transform:rotate(-6deg) scale(2.4);opacity:0}to{transform:rotate(-6deg) scale(1);opacity:1}}
+.done-h{font-size:clamp(34px,9vw,54px);font-weight:800;letter-spacing:-.025em;margin:20px 0 8px}
+.done-when{font-size:18px;margin:0 0 6px}
+.dbag{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.dbag:last-child{border-bottom:0}
+.dbag .st{font-size:14px;font-weight:600;color:var(--ok);white-space:nowrap}
+.dbag .st.over{color:var(--warn)}
+.dbag .kg{font-variant-numeric:tabular-nums;color:var(--muted);font-size:15px}
+a{color:var(--accent)}
+.basis a{color:inherit}
+/* Sticky progress */
+.sticky{position:fixed;top:0;left:0;right:0;z-index:20;padding-top:env(safe-area-inset-top,0px);background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);transform:translateY(-100%);transition:transform .25s ease;visibility:hidden}
+.sticky.show{transform:none;visibility:visible}
+.sticky-in{max-width:720px;margin:0 auto;padding:10px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.sticky-in b{font-family:"Bricolage Grotesque",Figtree,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.sticky-in span{font-variant-numeric:tabular-nums;font-weight:700}
+/* Footer */
+.foot{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+.foot p{margin:0 0 6px}
+.print-only{display:none}
+@media print{
+  @page{margin:14mm}
+  :root{--bg:#fff;--paper:#fff;--ink:#000;--muted:#444;--line:#ccc;padding:0}
+  body{background:#fff;color:#000;font-size:12pt}
+  .wrap{max-width:none;padding:0}
+  .lede,.trips,#trip,#wxCard,#progCard,#bagsCard,#noCard,#shopCard,.seg,.addbox,.row-actions,.finish,.forget,.sticky,.foot,#done,.step button,.buy,.rm,.fine,.brand .case{display:none!important}
+  .print-only{display:block;margin:0 0 10px;font-weight:600}
+  .brand h1{font-size:28pt}.tagline{font-size:12pt;margin-bottom:6px}
+  section.card{border:0;padding:0;margin:0 0 10px}
+  h2{font-size:16pt}h3{font-size:12pt;margin:12px 0 4px}
+  ul.items li{padding:3px 0;break-inside:avoid;border:0}
+  .meta{margin-top:0}
+  .where{border:0;padding:0;background:none!important;color:#444!important}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="case" aria-hidden="true">🧳</span><h1>PackPal</h1></div>
+    <p class="tagline">Pack smarter. Travel lighter.</p>
+    <p class="lede">Tell it where you're going, when, what you're doing and how you're travelling. It works out what you actually need, and what you don't.</p>
+  </header>
+
+  <div class="trips hidden" id="tripsBox">
+    <div class="trips-head"><h2>Your trips</h2><button class="ghost" type="button" id="newTrip">New trip</button></div>
+    <div id="tripList"></div>
+    <p class="fine" style="margin-top:2px">Saved on this device.</p>
+  </div>
+
+  <form class="tag" id="trip" novalidate>
+    <div class="field">
+      <label for="dest">Where are you going?</label>
+      <input type="text" id="dest" placeholder="e.g. Antalya, Turkey" autocomplete="off">
+    </div>
+    <div class="two field">
+      <div><label class="lbl" for="from">Fly out</label><input type="date" id="from"></div>
+      <div><label class="lbl" for="to">Fly home</label><input type="date" id="to"></div>
+    </div>
+    <div class="field">
+      <span class="lbl" id="actLbl">What's the trip? <span class="hint">Pick as many as you like</span></span>
+      <div class="chips" id="acts" role="group" aria-labelledby="actLbl"></div>
+      <input type="text" id="otherTxt" class="hidden" placeholder="Tell it more, e.g. golf, stag do, conference" style="margin-top:10px">
+    </div>
+    <div class="field">
+      <label for="airline">Airline and fare</label>
+      <select id="airline"></select>
+      <p class="fine hidden" id="airNote" style="margin-top:6px"></p>
+    </div>
+    <div class="two field">
+      <div>
+        <label class="lbl" for="hold">Checked suitcase</label>
+        <select id="hold">
+          <option value="0">None</option>
+          <option value="10">10 kg</option>
+          <option value="15">15 kg</option>
+          <option value="20" selected>20 kg</option>
+          <option value="22">22 kg</option>
+          <option value="23">23 kg</option>
+          <option value="26">26 kg</option>
+          <option value="32">32 kg</option>
+        </select>
+      </div>
+      <div>
+        <label class="lbl" for="cabin">Cabin bag</label>
+        <select id="cabin">
+          <option value="0">None</option>
+          <option value="7">7 kg</option>
+          <option value="10" selected>10 kg</option>
+          <option value="12">12 kg</option>
+          <option value="15">15 kg</option>
+          <option value="23">23 kg</option>
+        </select>
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" id="under" checked><span>Personal item <span class="hint">backpack or handbag under the seat</span></span></label>
+    <label class="check"><input type="checkbox" id="laundry"><span>I can wash clothes while I'm away</span></label>
+    <button class="go" id="goBtn" type="submit">Work out my packing</button>
+    <p class="err hidden" id="formErr" role="alert"></p>
+  </form>
+
+  <div class="sticky" id="sticky" aria-hidden="true"><div class="sticky-in"><b id="stDest"></b><div class="track"><i id="stBar" style="width:0"></i></div><span id="stPct">0%</span></div></div>
+
+  <div id="results" class="hidden">
+    <p class="print-only" id="printTitle"></p>
+    <section class="card" id="wxCard">
+      <h2 id="wxTitle">Weather</h2>
+      <div id="wxBody"></div>
+      <h3 id="impactH">Packing impact</h3>
+      <ul class="impact" id="impact"></ul>
+      <div class="band">
+        <span class="lbl" id="bandLbl">Pack for</span>
+        <div class="chips" id="bands" role="group" aria-labelledby="bandLbl"></div>
+        <label class="check" style="margin-top:10px"><input type="checkbox" id="rain"><span>Expect some rain</span></label>
+      </div>
+    </section>
+
+    <section class="card" id="progCard" aria-live="polite">
+      <h2 id="progTitle">Progress</h2>
+      <div class="score"><b id="pct">0%</b><span>packed</span></div>
+      <div class="counts" id="counts"></div>
+      <div id="catBars"></div>
+    </section>
+
+    <section class="card" id="bagsCard">
+      <h2>Will it fit?</h2>
+      <div class="legend"><span><i class="sw p"></i>Packed (ticked off)</span><span><i class="sw s"></i>Still to pack</span></div>
+      <div id="bags"></div>
+    </section>
+
+    <section class="card">
+      <h2>Your list</h2>
+      <div class="seg" role="group" aria-label="Group the list">
+        <button type="button" id="byCat" aria-pressed="true">By category</button>
+        <button type="button" id="byBag" aria-pressed="false">By bag</button>
+      </div>
+      <div id="list"></div>
+      <form class="addbox" id="addForm" novalidate>
+        <h3>Add something that's missing</h3>
+        <div class="addgrid">
+          <div><label class="mini" for="newName">Item</label><input type="text" id="newName" placeholder="e.g. Hair straighteners" maxlength="60" autocomplete="off"></div>
+          <div><label class="mini" for="newQty">How many</label><input type="number" id="newQty" value="1" min="1" max="30" inputmode="numeric"></div>
+        </div>
+        <div class="addgrid2">
+          <div><label class="mini" for="newKg">Roughly weighs</label>
+            <select id="newKg">
+              <option value="0.1">Very light (100 g)</option>
+              <option value="0.3" selected>Light (300 g)</option>
+              <option value="0.6">Medium (600 g)</option>
+              <option value="1">Heavy (1 kg)</option>
+              <option value="2">Very heavy (2 kg)</option>
+            </select></div>
+          <div><label class="mini" for="newBag">Goes in</label>
+            <select id="newBag">
+              <option value="auto">Let PackPal decide</option>
+              <option value="hold">Checked suitcase</option>
+              <option value="cabin">Cabin bag</option>
+              <option value="under">Personal item</option>
+              <option value="wear">Wear it</option>
+            </select></div>
+        </div>
+        <button class="addbtn" type="submit">Add to list</button>
+        <p class="err hidden" id="addErr" role="alert"></p>
+      </form>
+      <div class="row-actions">
+        <button class="ghost hidden" type="button" id="restoreBtn"></button>
+        <button class="ghost" type="button" id="copyBtn">Copy list</button>
+        <button class="ghost" type="button" id="printBtn">Print list</button>
+        <button class="ghost" type="button" id="resetTicks">Untick everything</button>
+      </div>
+      <p class="fine">Weights are rough averages so you can plan. Always check your airline's own limits and bag sizes.</p>
+    </section>
+
+    <section class="card" id="noCard">
+      <h2>You probably don't need</h2>
+      <ul class="nopack" id="noList"></ul>
+      <p class="fine">Pack less. Don't forget anything.</p>
+    </section>
+
+    <section class="card" id="shopCard">
+      <h2>Shopping list</h2>
+      <p class="fine hidden" id="shopEmpty" style="margin-top:0">Tap "Need to buy" on anything you haven't got yet and it'll appear here.</p>
+      <ul class="items" id="shopList"></ul>
+      <div class="row-actions hidden" id="shopActions"><button class="ghost" type="button" id="copyShop">Copy shopping list</button></div>
+    </section>
+
+    <section class="card">
+      <h2>Airport and departure</h2>
+      <h3 style="margin-top:0">Don't forget</h3>
+      <ul class="dflist" id="essList"></ul>
+      <h3>Before leaving home</h3>
+      <ul class="items" id="homeList"></ul>
+    </section>
+
+    <button class="go finish" type="button" id="finishBtn">I'm ready to go</button>
+    <div class="forget hidden" id="forget" role="alert">
+      <h3>Your list looks good, but you're missing:</h3>
+      <ul id="forgetList"></ul>
+      <div class="row-actions">
+        <button class="primary" type="button" id="forgetPacked">I've packed these</button>
+        <button class="ghost" type="button" id="forgetGo">Go anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="card done-card hidden" id="done" aria-live="polite">
+    <span class="stamp" id="stamp">PACKED<small id="stampDate"></small></span>
+    <h2 class="done-h" id="doneTitle"></h2>
+    <p class="done-when" id="doneWhen"></p>
+    <p class="fine" id="doneWx"></p>
+    <h3>Your bags</h3>
+    <div id="doneBags"></div>
+    <div id="doneLeft"></div>
+    <div id="doneShop"></div>
+    <h3>Before leaving home</h3>
+    <ul class="items" id="doneHome"></ul>
+    <div class="row-actions">
+      <button class="ghost" type="button" id="backBtn">Back to my list</button>
+      <button class="ghost" type="button" id="anotherBtn">Plan another trip</button>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Weather data by <a href="https://open-meteo.com/" rel="noopener">Open-Meteo.com</a>. Your trips and lists are saved in this browser only. Nothing is sent anywhere else.</p>
+    <p>Baggage allowances change often. Always check your booking.</p>
+  </footer>
+</div>
+<script>
+(function(){
+const $ = s => document.querySelector(s);
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+const el = (tag, props={}, kids=[]) => { const n=document.createElement(tag); for(const [k,v] of Object.entries(props)){ if(k.startsWith('aria-')) n.setAttribute(k,v); else n[k]=v; } for(const k of [].concat(kids)) if(k!=null && k!==false) n.append(k); return n; };
+const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const ACTS = [['beach','Beach'],['city','City exploring'],['pool','Pool'],['nightlife','Nightlife'],['hiking','Hiking'],['ski','Skiing'],['business','Business'],['wedding','Wedding'],['festival','Festival'],['cruise','Cruise'],['other','Other']];
+const BANDS = [['hot','Hot'],['warm','Warm'],['mild','Mild'],['cool','Cool'],['cold','Cold']];
+const ICON = {sun:'☀️',cloud:'☁️',rain:'🌧️',storm:'⛈️',snow:'❄️',mixed:'⛅'};
+const HOME_JOBS = ['Check in online','Check your airport transfer or parking','Check the forecast again','Lock windows and doors','Take the bins out','Unplug appliances','Turn the heating down or off'];
+
+/* Plug types by country: [types, voltage]. UK-style Type G needs no adapter. */
+const PLUGS = {GB:['G',230],IE:['G',230],MT:['G',230],CY:['G',230],GI:['G',230],AE:['G',230],QA:['G',230],BH:['G',230],SA:['G',230],KW:['G',240],OM:['G',240],SG:['G',230],MY:['G',240],HK:['G',220],MU:['C, G',230],KE:['G',240],TZ:['G',230],UG:['G',240],GH:['G',230],NG:['D, G',230],MV:['C, D, G',230],LK:['D, G',230],
+  ES:['C, F',230],PT:['C, F',230],FR:['C, E',230],BE:['C, E',230],PL:['C, E',230],CZ:['C, E',230],SK:['C, E',230],DE:['C, F',230],NL:['C, F',230],AT:['C, F',230],GR:['C, F',230],HR:['C, F',230],TR:['C, F',230],HU:['C, F',230],SE:['C, F',230],NO:['C, F',230],FI:['C, F',230],IS:['C, F',230],BG:['C, F',230],RO:['C, F',230],SI:['C, F',230],ME:['C, F',230],AL:['C, F',230],RS:['C, F',230],BA:['C, F',230],MK:['C, F',230],EE:['C, F',230],LV:['C, F',230],LT:['C, F',230],LU:['C, F',230],
+  IT:['C, F, L',230],CH:['C, J',230],LI:['C, J',230],DK:['C, E, F, K',230],IL:['C, H',230],EG:['C, F',220],MA:['C, E',220],TN:['C, E',230],JO:['B, C, D, F, G, J',230],ZA:['M, N',230],IN:['C, D, M',230],ID:['C, F',230],TH:['A, B, C, O',230],VN:['A, C',220],KH:['A, C, G',230],PH:['A, B, C',220],CN:['A, C, I',220],KR:['C, F',220],TW:['A, B',110],AU:['I',230],NZ:['I',230],FJ:['I',240],AR:['C, I',220],BR:['C, N',127],CL:['C, L',220],PE:['A, C',220],CO:['A, B',110],CR:['A, B',120],
+  US:['A, B',120],CA:['A, B',120],MX:['A, B',127],JP:['A, B',100],DO:['A, B',120],JM:['A, B',110],BB:['A, B',115],BS:['A, B',120],CU:['A, B, C, L',110],LC:['G',240],AG:['A, B',230],TC:['A, B',120],KY:['A, B',120],BM:['A, B',120]};
+const plugFor = cc => { const p = cc && PLUGS[cc.toUpperCase()]; return p ? {types:p[0], volts:p[1], text:`Type ${p[0]}, ${p[1]}V`, same: p[0]==='G'} : null; };
+
+const PRESETS = [
+  {g:'Ryanair', items:[
+    {id:'fr-basic', n:'Basic (small bag only)', hold:0, cabin:0, under:true, ul:0, note:'Free personal item up to 40×30×20 cm.'},
+    {id:'fr-prio', n:'Priority & 2 Cabin Bags', hold:0, cabin:10, under:true, ul:0, note:'10 kg cabin bag up to 55×40×20 cm, plus a personal item up to 40×30×20 cm.'},
+    {id:'fr-20', n:'20 kg check-in bag', hold:20, cabin:0, under:true, ul:0, note:'20 kg checked suitcase, plus a personal item up to 40×30×20 cm.'},
+    {id:'fr-prio20', n:'Priority + 20 kg check-in bag', hold:20, cabin:10, under:true, ul:0, note:'20 kg checked suitcase, 10 kg cabin bag (55×40×20 cm) and a personal item (40×30×20 cm).'}
+  ]},
+  {g:'easyJet', items:[
+    {id:'u2-std', n:'Standard (small bag only)', hold:0, cabin:0, under:true, ul:15, note:'Free personal item up to 45×36×20 cm, 15 kg.'},
+    {id:'u2-large', n:'Large cabin bag', hold:0, cabin:15, under:true, ul:15, note:'Large cabin bag up to 56×45×25 cm, plus a personal item up to 45×36×20 cm.'},
+    {id:'u2-23', n:'23 kg hold bag', hold:23, cabin:0, under:true, ul:15, note:'23 kg checked suitcase, plus a personal item up to 45×36×20 cm.'},
+    {id:'u2-large23', n:'Large cabin bag + 23 kg hold bag', hold:23, cabin:15, under:true, ul:15, note:'23 kg checked suitcase, large cabin bag (56×45×25 cm) and a personal item (45×36×20 cm).'}
+  ]},
+  {g:'Jet2', items:[
+    {id:'ls-flight', n:'Flight only', hold:0, cabin:10, under:true, ul:0, note:'10 kg cabin bag up to 56×45×25 cm, plus a small handbag or laptop bag.'},
+    {id:'ls-22', n:'With 22 kg hold bag', hold:22, cabin:10, under:true, ul:0, note:'22 kg checked suitcase, 10 kg cabin bag (56×45×25 cm) and a small handbag or laptop bag.'}
+  ]},
+  {g:'TUI', items:[
+    {id:'by-pkg', n:'Package holiday', hold:20, cabin:10, under:true, ul:0, note:'Usually a 20 kg checked suitcase (some bookings differ), 10 kg cabin bag up to 55×40×20 cm and a small personal item.'}
+  ]},
+  {g:'British Airways', items:[
+    {id:'ba-hand', n:'Hand baggage only', hold:0, cabin:23, under:true, ul:23, note:'Cabin bag up to 56×45×25 cm and a handbag or laptop bag up to 40×30×15 cm, 23 kg each.'},
+    {id:'ba-23', n:'With 23 kg hold bag', hold:23, cabin:23, under:true, ul:23, note:'23 kg checked suitcase, plus a cabin bag (56×45×25 cm) and handbag (40×30×15 cm), 23 kg each.'}
+  ]},
+  {g:'Wizz Air', items:[
+    {id:'w6-basic', n:'Basic (small bag only)', hold:0, cabin:0, under:true, ul:10, note:'Free personal item up to 40×30×20 cm, 10 kg.'},
+    {id:'w6-prio', n:'WIZZ Priority', hold:0, cabin:10, under:true, ul:10, note:'10 kg trolley bag up to 55×40×23 cm, plus a personal item up to 40×30×20 cm.'},
+    {id:'w6-prio20', n:'WIZZ Priority + 20 kg check-in bag', hold:20, cabin:10, under:true, ul:10, note:'20 kg checked suitcase, 10 kg trolley bag (55×40×23 cm) and a personal item (40×30×20 cm).'}
+  ]}
+];
+const findPreset = id => { for(const g of PRESETS) for(const p of g.items) if(p.id===id) return p; return null; };
+
+
+const state = { trip:null, key:null, wx:null, band:'warm', rain:false, items:[], bags:[], ticks:{}, removed:{}, custom:[], qty:{}, buy:{}, bought:{}, home:{}, view: store.get('packpal:view') || 'cat' };
+
+/* ---------- Form ---------- */
+const actsEl = $('#acts');
+const saved = store.get('packpal:last') || {};
+for(const [k,label] of ACTS){
+  const b = el('button',{type:'button',className:'chip',textContent:label});
+  b.dataset.k = k; b.setAttribute('aria-pressed', (saved.acts || ['beach','pool']).includes(k));
+  b.onclick = () => { const on = b.getAttribute('aria-pressed')!=='true'; b.setAttribute('aria-pressed',on); if(k==='other') $('#otherTxt').classList.toggle('hidden',!on); };
+  actsEl.append(b);
+}
+const iso = d => d.toISOString().slice(0,10);
+const today = new Date();
+const plus = n => { const d=new Date(today); d.setDate(d.getDate()+n); return iso(d); };
+$('#from').min = iso(today);
+$('#from').addEventListener('change',()=>{ $('#to').min = $('#from').value; if($('#to').value < $('#from').value) $('#to').value = $('#from').value; });
+
+const airSel = $('#airline');
+airSel.append(el('option',{value:'custom',textContent:'My own allowances'}));
+for(const g of PRESETS){
+  const og = document.createElement('optgroup'); og.label = g.g;
+  for(const p of g.items) og.append(el('option',{value:p.id,textContent:`${g.g} ${p.n}`}));
+  airSel.append(og);
+}
+function showAirNote(){
+  const p = findPreset(airSel.value), n = $('#airNote');
+  n.classList.toggle('hidden', !p);
+  n.textContent = p ? p.note + ' Allowances change, so check your booking.' : '';
+}
+airSel.addEventListener('change', () => {
+  const p = findPreset(airSel.value);
+  if(p){ $('#hold').value = String(p.hold); $('#cabin').value = String(p.cabin); $('#under').checked = p.under; }
+  showAirNote();
+});
+for(const id of ['#hold','#cabin','#under']) $(id).addEventListener('change', () => { airSel.value = 'custom'; showAirNote(); });
+
+function fillForm(t){
+  $('#dest').value = t.dest || '';
+  $('#from').value = t.from && t.from >= iso(today) ? t.from : plus(14);
+  $('#to').value = t.to && t.to >= $('#from').value ? t.to : plus(21);
+  const acts = t.acts || ['beach','pool'];
+  for(const b of actsEl.children) b.setAttribute('aria-pressed', acts.includes(b.dataset.k));
+  $('#otherTxt').classList.toggle('hidden', !acts.includes('other')); $('#otherTxt').value = t.other || '';
+  if(t.hold!=null) $('#hold').value = String(t.hold);
+  if(t.cabin!=null) $('#cabin').value = String(t.cabin);
+  if(t.under!=null) $('#under').checked = t.under;
+  if(t.laundry!=null) $('#laundry').checked = t.laundry;
+  airSel.value = t.airline && findPreset(t.airline) ? t.airline : 'custom'; showAirNote();
+}
+fillForm(saved);
+
+const bandsEl = $('#bands');
+for(const [k,label] of BANDS){
+  const b = el('button',{type:'button',className:'chip',textContent:label}); b.dataset.k=k;
+  b.onclick = () => { state.band=k; state.bandManual=true; syncBands(); rebuild(); };
+  bandsEl.append(b);
+}
+function syncBands(){ for(const b of bandsEl.children) b.setAttribute('aria-pressed', b.dataset.k===state.band); $('#rain').checked = state.rain; }
+$('#rain').onchange = e => { state.rain = e.target.checked; state.bandManual=true; rebuild(); };
+
+const tripKey = t => 'packpal:ticks:' + [t.dest.toLowerCase(),t.from,t.to].join('|');
+
+$('#trip').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = $('#formErr'); err.classList.add('hidden');
+  const t = {
+    dest: $('#dest').value.trim(),
+    from: $('#from').value, to: $('#to').value,
+    acts: [...actsEl.children].filter(b=>b.getAttribute('aria-pressed')==='true').map(b=>b.dataset.k),
+    other: $('#otherTxt').value.trim(),
+    hold: +$('#hold').value, cabin: +$('#cabin').value,
+    under: $('#under').checked, laundry: $('#laundry').checked,
+    airline: airSel.value, ul: (findPreset(airSel.value) || {}).ul || 0
+  };
+  const fail = m => { err.textContent = m; err.classList.remove('hidden'); };
+  if(!t.dest) return fail("Add where you're going.");
+  if(!t.from || !t.to) return fail('Add both travel dates.');
+  if(t.to < t.from) return fail('Your fly-home date is before your fly-out date.');
+  t.nights = Math.round((new Date(t.to) - new Date(t.from)) / 864e5);
+  if(t.nights > 60) return fail('PackPal handles trips up to 60 nights.');
+  if(!t.hold && !t.cabin && !t.under) return fail('Pick at least one bag.');
+  store.set('packpal:last', t);
+  state.trip = t; state.key = tripKey(t); loadTripData();
+  hideForget();
+
+  const prev = getTrips().find(r => r.key === state.key);
+  const reuse = prev && prev.wx && prev.wx.at && JSON.stringify(prev.t.acts) === JSON.stringify(t.acts) && (prev.t.other||'') === t.other;
+  showView('plan');
+  if(reuse){
+    state.wx = prev.wx; state.band = prev.band || 'warm'; state.rain = !!prev.rain; state.bandManual = !!prev.bandManual;
+    renderWeather(); syncBands(); rebuild(); scrollToResults();
+    if(isStale(prev.wx)) refreshWeather();
+    return;
+  }
+  const btn = $('#goBtn'); btn.disabled = true; btn.textContent = 'Getting the forecast…';
+  $('#wxTitle').textContent = 'Weather';
+  $('#wxBody').replaceChildren(el('p',{className:'loading',textContent:`Getting the weather for ${t.dest}…`}));
+  state.wx = null; state.band = 'warm'; state.rain = false; state.bandManual = false; syncBands(); rebuild();
+  scrollToResults();
+
+  const wx = await fetchWeather(t);
+  btn.disabled = false; btn.textContent = 'Work out my packing';
+  if(state.key !== tripKey(t)) return;
+  if(wx.error) showWxFallback(wx.error); else applyWeather(wx);
+  syncBands(); rebuild();
+});
+
+/* ---------- Weather (Open-Meteo, no key needed) ---------- */
+async function getJSON(url){
+  const c = new AbortController(); const tm = setTimeout(() => c.abort(), 12000);
+  try { const r = await fetch(url, {signal: c.signal}); if(!r.ok) throw new Error('HTTP ' + r.status); return await r.json(); }
+  finally { clearTimeout(tm); }
+}
+const addDays = (d, n) => { const x = new Date(d+'T12:00:00Z'); x.setUTCDate(x.getUTCDate()+n); return x.toISOString().slice(0,10); };
+const shiftYear = (d, y) => { const [Y,M,D] = d.split('-').map(Number); let x = new Date(Date.UTC(Y+y, M-1, D)); if(x.getUTCMonth() !== M-1) x = new Date(Date.UTC(Y+y, M, 0)); return x.toISOString().slice(0,10); };
+const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+const COUNTRY_ALIAS = {uk:'GB','united kingdom':'GB',england:'GB',scotland:'GB',wales:'GB','northern ireland':'GB',usa:'US',us:'US',america:'US','united states':'US',turkiye:'TR','türkiye':'TR',holland:'NL','the netherlands':'NL',uae:'AE',dubai:'AE'};
+function codeToCond(c){
+  if(c == null) return 'mixed';
+  if(c <= 1) return 'sun'; if(c === 2) return 'mixed'; if(c <= 48) return 'cloud';
+  if(c >= 95) return 'storm'; if((c >= 71 && c <= 77) || c === 85 || c === 86) return 'snow';
+  return 'rain';
+}
+async function geocode(q){
+  const parts = q.split(',').map(x => x.trim()).filter(Boolean);
+  const hint = parts.slice(1).join(' ').toLowerCase();
+  const j = await getJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(parts[0])}&count=10&language=en&format=json`);
+  const res = j.results || [];
+  if(!res.length) return null;
+  if(!hint) return res[0];
+  const code = COUNTRY_ALIAS[hint] || (hint.length === 2 ? hint.toUpperCase() : null);
+  return res.find(r => (code && r.country_code === code) || [r.country, r.admin1].filter(Boolean).some(v => { v = v.toLowerCase(); return v.includes(hint) || hint.includes(v); })) || res[0];
+}
+async function fetchWeather(t){
+  let g;
+  try { g = await geocode(t.dest); } catch(e){ return {error:'network'}; }
+  if(!g) return {error:'notfound'};
+  const n = Math.min(t.nights+1, 30);
+  const dates = Array.from({length:n}, (_,i) => addDays(t.from, i));
+  const lastFc = addDays(iso(new Date()), 15);
+  const fc = dates.filter(d => d <= lastFc), hist = dates.filter(d => d > lastFc);
+  const loc = `latitude=${g.latitude}&longitude=${g.longitude}&timezone=auto`;
+  const byDate = {};
+  const jobs = [];
+  if(fc.length) jobs.push(getJSON(`https://api.open-meteo.com/v1/forecast?${loc}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&start_date=${fc[0]}&end_date=${fc[fc.length-1]}`).then(j => {
+    const D = j.daily;
+    D.time.forEach((d,i) => { if(D.temperature_2m_max[i] == null) return; byDate[d] = {date:d, high:Math.round(D.temperature_2m_max[i]), low:Math.round(D.temperature_2m_min[i]), rain:Math.round(D.precipitation_probability_max[i] ?? 0), cond:codeToCond(D.weather_code[i]), src:'fc'}; });
+  }).catch(() => {}));
+  if(hist.length) jobs.push(Promise.all([1,2,3].map(y =>
+    getJSON(`https://archive-api.open-meteo.com/v1/archive?${loc}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&start_date=${shiftYear(hist[0],-y)}&end_date=${shiftYear(hist[hist.length-1],-y)}`)
+      .then(j => ({y, D:j.daily})).catch(() => null)
+  )).then(rs => {
+    rs = rs.filter(r => r && r.D && r.D.time);
+    if(!rs.length) return;
+    const idx = rs.map(r => Object.fromEntries(r.D.time.map((d,i) => [d,i])));
+    for(const d of hist){
+      const hs=[], ls=[], wet=[], conds=[];
+      rs.forEach((r,k) => { const i = idx[k][shiftYear(d,-r.y)]; if(i == null || r.D.temperature_2m_max[i] == null) return;
+        hs.push(r.D.temperature_2m_max[i]); ls.push(r.D.temperature_2m_min[i]); wet.push((r.D.precipitation_sum[i] || 0) >= 1); conds.push(codeToCond(r.D.weather_code[i])); });
+      if(!hs.length) continue;
+      const rain = Math.round(wet.filter(Boolean).length / wet.length * 100);
+      const tally = {}; for(const c of conds) tally[c] = (tally[c]||0) + 1;
+      let cond = Object.entries(tally).sort((a,b) => b[1]-a[1])[0][0];
+      if(rain >= 67 && cond !== 'snow') cond = 'rain'; else if(cond === 'rain' && rain < 34) cond = 'cloud'; else if(cond === 'rain' && rain < 67) cond = 'mixed';
+      byDate[d] = {date:d, high:Math.round(avg(hs)), low:Math.round(avg(ls)), rain, cond, src:'hist'};
+    }
+  }));
+  // Sea temperature (coastal places only; quietly skipped if unavailable)
+  let sea = null;
+  const seaStart = fc.length ? fc[0] : shiftYear(dates[0], -1), seaEnd = fc.length ? fc[fc.length-1] : shiftYear(dates[dates.length-1], -1);
+  jobs.push(getJSON(`https://marine-api.open-meteo.com/v1/marine?${loc}&hourly=sea_surface_temperature&start_date=${seaStart}&end_date=${seaEnd}`)
+    .then(j => { const v = (j.hourly && j.hourly.sea_surface_temperature || []).filter(x => x != null); if(v.length) sea = Math.round(avg(v)); }).catch(() => {}));
+  await Promise.all(jobs);
+  const days = dates.map(d => byDate[d]).filter(Boolean);
+  if(!days.length) return {error:'network'};
+  const nf = days.filter(d => d.src === 'fc').length;
+  const plug = plugFor(g.country_code);
+  const w = {place: [g.name, g.country].filter(Boolean).join(', '), cc: g.country_code || '', country: g.country || '', days, sea,
+    plug: plug ? plug.text : '', plugSame: !!(plug && plug.same), basis: nf === days.length ? 'forecast' : nf ? 'mixed' : 'history', nf, at: Date.now()};
+  w.summary = summarise(w);
+  return w;
+}
+function summarise(w){
+  const s = wxStats(w);
+  const tally = {}; for(const d of w.days) tally[d.cond] = (tally[d.cond]||0) + 1;
+  const top = Object.entries(tally).sort((a,b) => b[1]-a[1])[0][0];
+  const lead = {sun:'Mostly sunny', mixed:'A mix of sun and cloud', cloud:'Often cloudy', rain:'Often wet', storm:'Unsettled, with some storms', snow:'Snowy'}[top];
+  return `${lead}, around ${s.high}°C by day and ${s.low}°C at night.${s.rain >= 40 && top !== 'rain' ? ' Expect some rain.' : ''}`;
+}
+function applyWeather(wx){
+  state.wx = wx;
+  if(!state.bandManual){
+    const s = wxStats(wx);
+    state.band = s.high>=27?'hot':s.high>=21?'warm':s.high>=14?'mild':s.high>=7?'cool':'cold';
+    const wet = wx.days.filter(d=>['rain','storm'].includes(d.cond)).length;
+    state.rain = s.rain >= 35 || wet >= Math.max(2, wx.days.length*0.3);
+  }
+  renderWeather();
+}
+async function refreshWeather(){
+  const t = state.trip, key = state.key;
+  const wx = await fetchWeather(t);
+  if(state.key !== key || wx.error) return;
+  applyWeather(wx); syncBands(); rebuild();
+}
+function wxStats(w){
+  const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+  const hs = w.days.map(d=>d.high).filter(Number.isFinite), ls = w.days.map(d=>d.low).filter(Number.isFinite);
+  return { high: Math.round(avg(hs) ?? 22), low: Math.round(avg(ls) ?? 15), rain: Math.round(avg(w.days.map(d=>d.rain)) ?? 20), sea: w.sea };
+}
+function showWxFallback(reason){
+  $('#wxTitle').textContent = 'Weather';
+  const msg = reason === 'notfound'
+    ? `Couldn't find "${state.trip ? state.trip.dest : ''}". Try just the town or city, e.g. "Antalya" or "Palma, Spain". For now, pick the conditions below.`
+    : "Couldn't reach the weather service just now, so pick the conditions below and the list will update.";
+  $('#wxBody').replaceChildren(el('p',{className:'basis',textContent:msg}));
+}
+const isStale = w => !w || !w.at || (Date.now() - w.at > 6*36e5 && state.trip && state.trip.to >= iso(new Date()));
+function renderWeather(){
+  const w = state.wx, t = state.trip;
+  const place = w.place || t.dest;
+  $('#wxTitle').textContent = place.split(',')[0];
+  const s = wxStats(w);
+  const body = [el('p',{className:'place',textContent:`${fmtShort(t.from)} to ${fmtShort(t.to)}${w.place ? ', ' + w.place.split(',').slice(1).join(',').trim() : ''}`})];
+  const stat = (big, small) => el('div',{className:'wxstat'},[el('b',{textContent:big}), el('span',{textContent:small})]);
+  const stats = el('div',{className:'wxstats'},[
+    stat(`☀️ ${s.high}°C`, 'Average daytime'),
+    stat(`🌙 ${s.low}°C`, 'Evenings'),
+    stat(`🌧️ ${s.rain}%`, 'Chance of rain'),
+    s.sea != null ? stat(`🌊 ~${s.sea}°C`, 'Sea') : null
+  ]);
+  body.push(stats);
+  if(w.summary) body.push(el('p',{textContent:w.summary,style:'margin:0'}));
+  const basis = w.basis === 'forecast' ? 'Live forecast. PackPal refreshes it when you come back to this trip.'
+    : w.basis === 'mixed' ? `Live forecast for the first ${w.nf} day${w.nf>1?'s':''}. The rest is based on the same dates over the last three years, and switches to the forecast as your trip gets closer.`
+    : 'Your trip is more than two weeks away, so this is based on the same dates over the last three years. It switches to the live forecast once you are within 16 days.';
+  body.push(el('p',{className:'basis',textContent:basis}));
+  const strip = el('div',{className:'days'});
+  for(const d of w.days){
+    const dt = new Date(d.date+'T12:00:00');
+    const lbl = isNaN(dt) ? d.date : dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'});
+    strip.append(el('div',{className:'day'},[
+      el('div',{className:'d',textContent:lbl}),
+      el('div',{className:'i',textContent:ICON[d.cond],title:d.cond}),
+      el('div',{className:'t'},[`${d.high}° `, el('span',{textContent:`${d.low}°`})]),
+      el('div',{className:'r',textContent:`${d.rain}% rain`})
+    ]));
+  }
+  body.push(strip);
+  if(t.nights+1 > w.days.length) body.push(el('p',{className:'fine',textContent:`Showing the first ${w.days.length} days.`}));
+  if(w.plug) body.push(el('p',{className:'fine',textContent: w.plugSame ? `Plugs: ${w.plug}, the same as the UK.` : `Plugs: ${w.plug}.`}));
+  $('#wxBody').replaceChildren(...body);
+}
+function renderImpact(){
+  const A = new Set(state.trip.acts), b = state.band, s = state.wx ? wxStats(state.wx) : null;
+  const lines = [];
+  const clothes = {hot:['🩳','Hot-weather clothing'],warm:['👕','Light summer clothing'],mild:['🧥','Layers for mild days'],cool:['🧣','Warm layers and a proper jacket'],cold:['🧤','Winter clothing and thermals']}[b];
+  lines.push(clothes);
+  if(A.has('beach') || A.has('pool')) lines.push(['🩴', A.has('beach') ? 'Beach gear' : 'Pool gear']);
+  if((b==='hot'||b==='warm') && s && s.low <= 20) lines.push(['🧥','Light layer for the evenings']);
+  if(state.rain) lines.push(['☔','Rain cover: umbrella or a packable waterproof']);
+  else lines.push(['🌂','Small umbrella probably unnecessary']);
+  if(s && s.sea != null && s.sea >= 22 && (A.has('beach')||A.has('cruise'))) lines.push(['🌊','Sea is warm enough for swimming']);
+  $('#impact').replaceChildren(...lines.map(([i,t]) => el('li',{},[el('span',{textContent:i,'aria-hidden':'true'}), el('span',{textContent:t})])));
+}
+
+/* ---------- List engine ---------- */
+const BANDWORD = {hot:'hot',warm:'warm',mild:'mild',cool:'cool',cold:'cold'};
+function buildList(t, band, rain){
+  const d = t.nights + 1;
+  const cap = t.laundry ? 5 : 14;
+  const c = x => Math.max(1, Math.min(Math.ceil(x), cap));
+  const out = []; const seen = new Set();
+  const A = new Set(t.acts);
+  const s = state.wx ? wxStats(state.wx) : null;
+  const basis = `Based on ${d} day${d>1?'s':''}${t.laundry ? ' with a wash' : ''} and ${BANDWORD[band]} weather`;
+  // where: valuable | hand | liquid | any | wear
+  const add = (cat,name,qty,kg,where,o={}) => {
+    if(seen.has(name)) return; seen.add(name);
+    out.push({id:(cat+'|'+name).toLowerCase(),cat,name,qty,kg,where,note:o.note||'',why:o.why||'',count:!!o.count,essential:!!o.ess});
+  };
+  const plug = state.wx && state.wx.plug;
+
+  const D = 'Documents & money';
+  add(D,'Passport',1,.05,'valuable',{ess:true});
+  add(D,'Boarding passes',1,.01,'valuable',{ess:true,note:'Saved offline on your phone too'});
+  add(D,'Wallet and bank cards',1,.1,'valuable',{ess:true});
+  add(D,'Some local cash',1,.02,'valuable');
+  add(D,'Travel insurance details',1,.01,'valuable',{ess:true});
+  add(D,'Medication',1,.1,'valuable',{ess:true,note:'Keep it with you, not in the hold'});
+
+  const E = 'Electronics';
+  add(E,'Phone',1,.2,'valuable',{ess:true});
+  add(E,'Phone charger',1,.1,'hand',{ess:true});
+  if(!(state.wx && state.wx.plugSame)) add(E,'Plug adapter',1,.1,'any',{note: plug || 'Check the local plug type'});
+  add(E,'Headphones',1,.2,'valuable');
+  if(d>2 || A.has('city') || A.has('hiking') || A.has('festival')) add(E,'Power bank',1,.25,'valuable',{note:'Hand luggage only on flights'});
+
+  const C = 'Clothes';
+  const why = basis;
+  add(C,'Underwear',c(d+1),.05,'any',{count:true,why});
+  add(C,'Socks', band==='hot' ? c(d/2) : c(d), band==='cold'?.08:.05,'any',{count:true,why: band==='hot' ? why + ', mostly in sandals' : why});
+  add(C,'Sleepwear',1,.2,'any',{count:true});
+  if(t.hold) add(C,'Spare change of clothes',1,.4,'hand',{note:'In your hand luggage in case your case goes missing'});
+  const beachy = A.has('beach') || A.has('pool');
+  if(band==='hot'){
+    add(C,'T-shirts',c(beachy ? d*0.8 : d),.15,'any',{count:true,why: beachy ? why + ', with pool or beach days' : why});
+    add(C,'Shorts',c(d/2),.25,'any',{count:true,why});
+    add(C,'Summer dresses or light trousers',c(d/4),.3,'any',{count:true});
+    add(C,'Sandals',1,.4,'any',{count:true});
+    add(C,'Trainers',1,.8,'wear',{note:'Wear these on the plane'});
+    if(s && s.low <= 20) add(C,'Light layer for evenings',1,.3,'any',{count:true,why:`Evenings around ${s.low}°C`});
+  } else if(band==='warm'){
+    add(C,'T-shirts',c(d),.15,'any',{count:true,why});
+    add(C,'Shorts',c(d/3),.25,'any',{count:true,why});
+    add(C,'Jeans or trousers',1,.6,'wear',{note:'Wear on the plane'});
+    add(C,'Light jumper',1,.35,'any',{count:true,why: s ? `Evenings around ${s.low}°C` : 'For evenings'});
+    add(C,'Sandals',1,.4,'any',{count:true});
+    add(C,'Trainers',1,.8,'wear',{note:'Wear these on the plane'});
+  } else if(band==='mild'){
+    add(C,'Tops',c(d),.2,'any',{count:true,why});
+    add(C,'Jeans or trousers',c(d/3),.6,'any',{count:true,why});
+    add(C,'Jumper or hoodie',2,.45,'any',{count:true});
+    add(C,'Light jacket',1,.6,'wear',{note:'Wear on the plane'});
+    add(C,'Trainers',1,.8,'wear',{note:'Wear these on the plane'});
+  } else if(band==='cool'){
+    add(C,'Long-sleeve tops',c(d),.22,'any',{count:true,why});
+    add(C,'Trousers',c(d/3),.6,'any',{count:true,why});
+    add(C,'Jumpers',2,.5,'any',{count:true});
+    add(C,'Warm jacket',1,1,'wear',{note:'Wear on the plane'});
+    add(C,'Boots or closed shoes',1,1,'wear',{note:'Wear these on the plane'});
+  } else {
+    add(C,'Thermal base layers',2,.2,'any',{count:true});
+    add(C,'Long-sleeve tops',c(d),.22,'any',{count:true,why});
+    add(C,'Warm trousers',c(d/3),.65,'any',{count:true,why});
+    add(C,'Thick jumpers',2,.6,'any',{count:true});
+    add(C,'Winter coat',1,1.5,'wear',{note:'Wear on the plane'});
+    add(C,'Hat, gloves and scarf',1,.3,'any');
+    add(C,'Warm boots',1,1.2,'wear',{note:'Wear these on the plane'});
+  }
+
+  const W = 'Weather';
+  if(band==='hot' || band==='warm' || A.has('ski')) { add(W,'Sun cream',1,.25,'liquid'); add(W,'Sunglasses',1,.05,'valuable'); }
+  if(band==='hot' || band==='warm') { add(W,'Sun hat or cap',1,.1,'any'); add(W,'After-sun',1,.2,'liquid'); }
+  if(rain){ add(W,'Compact umbrella',1,.3,'any'); if(band!=='cold' && band!=='cool') add(W,'Packable waterproof',1,.35,'any'); }
+
+  const T = 'Toiletries';
+  add(T,'Toothbrush and toothpaste',1,.15,'liquid',{note: t.hold ? '' : 'Travel-size toothpaste for hand luggage'});
+  add(T,'Deodorant',1,.15,'liquid');
+  add(T,'Shampoo and shower gel',1,.3,'liquid',{note:'Travel-size if going in hand luggage'});
+  add(T,'Skincare, make-up, shaving kit',1,.3,'liquid');
+  add(T,'Plasters and painkillers',1,.1,'any');
+
+  if(beachy){
+    const B = 'Beach & pool';
+    add(B,'Swimwear',c(Math.min(3, 1 + (A.has('beach')?1:0) + (A.has('pool')?1:0) + (d>6?1:0))),.1,'any',{count:true,why:'One to wear while another dries'});
+    add(B,'Flip-flops',1,.2,'any');
+    add(B,'Waterproof phone pouch',1,.05,'any');
+    add(B,'Book or e-reader',1,.3,'valuable');
+    if(A.has('beach')){ add(B,'Beach towel',1,.6,'any',{note:'Many hotels only lend pool towels'}); add(B,'Beach bag',1,.2,'any'); }
+    if(A.has('pool')) add(B,'Cover-up',1,.15,'any');
+  }
+  if(A.has('city')){
+    const X = 'City';
+    add(X,'Comfortable walking shoes',1,.7,'any',{note:"If your trainers aren't up to a lot of walking"});
+    add(X,'Day bag',1,.3,'any');
+    add(X,'Smarter outfit for dinner',1,.5,'any',{count:true});
+  }
+  if(A.has('nightlife')){
+    add('Nightlife','Going-out outfits',Math.min(c(d/2),4),.4,'any',{count:true,why:'About one for every other night'});
+    add('Nightlife','Going-out shoes',1,.6,'any');
+  }
+  if(A.has('hiking')){
+    const H = 'Hiking';
+    add(H,'Walking boots',1,1.2,'wear',{note:'Wear on the plane to save weight'});
+    add(H,'Waterproof jacket',1,.4,'any');
+    add(H,'Reusable water bottle',1,.2,'any');
+    add(H,'Blister plasters',1,.05,'any');
+    add(H,'Walking socks',Math.min(3,d),.08,'any',{count:true});
+  }
+  if(A.has('ski')){
+    const S = 'Skiing';
+    add(S,'Ski jacket and salopettes',1,2.2,'any');
+    add(S,'Thermal base layers',2,.2,'any',{count:true});
+    add(S,'Ski socks',c(d-1),.1,'any',{count:true,why:'One pair per ski day'});
+    add(S,'Ski gloves',1,.25,'any');
+    add(S,'Goggles',1,.2,'any');
+    add(S,'Neck warmer',1,.1,'any');
+    add(S,'Lip balm with SPF',1,.02,'valuable');
+  }
+  if(A.has('business')){
+    const Bz = 'Business';
+    add(Bz,'Work outfits',Math.min(d,5),.8,'any',{count:true,why:'One per working day'});
+    add(Bz,'Smart shoes',1,.9,'any');
+    add(Bz,'Laptop and charger',1,1.8,'valuable');
+  }
+  if(A.has('wedding')){
+    const F = 'Wedding';
+    add(F,'Suit or formal outfit',1,1.5,'hand',{note:'Carry it on if you can, so it arrives uncreased'});
+    add(F,'Shirt or top for the day',1,.3,'hand');
+    add(F,'Tie or accessories',1,.1,'any');
+    add(F,'Smart shoes',1,.9,'any');
+    add(F,'Belt',1,.2,'any');
+    add(F,'Wedding invitation',1,.02,'valuable',{note:'Venue and timings'});
+    add(F,'Gift and card',1,.4,'hand');
+    add(F,'Travel steamer',1,.6,'any');
+  }
+  if(A.has('festival')){
+    const Fe = 'Festival';
+    add(Fe,'Festival ticket or wristband',1,.01,'valuable',{ess:true});
+    add(Fe,'Wellies or waterproof boots',1,1.5,'any');
+    add(Fe,'Rain poncho',1,.1,'any');
+    add(Fe,'Bum bag',1,.15,'any');
+    add(Fe,'Earplugs',1,.01,'any');
+    add(Fe,'Wet wipes',1,.3,'any');
+    add(Fe,'Head torch',1,.1,'any');
+  }
+  if(A.has('cruise')){
+    const Cr = 'Cruise';
+    add(Cr,'Cruise documents',1,.02,'valuable',{ess:true});
+    add(Cr,'Formal night outfit',1,1,'any');
+    add(Cr,'Lanyard for your cruise card',1,.02,'any');
+    add(Cr,'Seasickness tablets',1,.02,'valuable');
+    add(Cr,'Day-trip backpack',1,.3,'any');
+  }
+
+  for(const cu of state.custom) out.push({id:'custom|'+cu.id,cat:'Your extras',name:cu.name,qty:cu.qty,kg:cu.kg,where:'any',pick:cu.bag!=='auto'?cu.bag:null,custom:cu.id,count:true,note:'',why:''});
+  const list = out.filter(i => !state.removed[i.id]);
+  for(const i of list){ if(state.qty[i.id] != null){ i.auto = i.qty; i.qty = state.qty[i.id]; } }
+  return list;
+}
+
+/* ---------- Don't pack ---------- */
+function dontPack(t){
+  const A = new Set(t.acts), b = state.band, out = [];
+  const has = n => state.items.some(i => i.name === n);
+  if(b==='hot' || b==='warm') out.push(['Heavy coat',"The forecast doesn't justify it"]);
+  if(!state.rain) out.push(['Umbrella','Low chance of rain']);
+  if((b==='hot' || b==='warm') && (A.has('beach') || A.has('pool'))) out.push(['More than one pair of jeans',"You'll mostly be in shorts and swimwear"]);
+  if(!A.has('hiking') && !A.has('city')) out.push(['A second pair of trainers','One pair covers it']);
+  out.push(['Hairdryer','Most hotels have one. Check yours']);
+  if(state.wx && state.wx.plugSame) out.push(['Plug adapter','Same plugs as the UK']);
+  if(A.has('pool') && !A.has('beach')) out.push(['Beach towel','Pool towels are usually provided']);
+  if(!t.hold) out.push(['Full-size toiletries','Take travel sizes or buy them there']);
+  if(!A.has('business') && t.nights <= 4) out.push(['Laptop',"Unless you really need it, it's nearly 2 kg"]);
+  if(!A.has('wedding') && !A.has('cruise') && !A.has('business')) out.push(['More than one smart outfit','One dressy outfit is enough for most trips']);
+  if(!t.laundry && t.nights >= 10) out.push(['Two weeks of everything','Ticking "I can wash clothes" cuts the load a lot']);
+  return out.filter(([n]) => !has(n)).slice(0, 7);
+}
+
+/* ---------- Bag allocation ---------- */
+const BAGNAMES = {hold:'Checked suitcase',cabin:'Cabin bag',under:'Personal item'};
+function allocate(items, t){
+  const bags = [];
+  if(t.hold) bags.push({k:'hold',name:BAGNAMES.hold,limit:t.hold,tare:3});
+  if(t.cabin) bags.push({k:'cabin',name:BAGNAMES.cabin,limit:t.cabin,tare:2});
+  if(t.under) bags.push({k:'under',name:BAGNAMES.under,limit:t.ul||0,tare:.5});
+  const has = k => bags.some(b=>b.k===k);
+  const main = has('hold') ? 'hold' : has('cabin') ? 'cabin' : 'under';
+  for(const it of items){
+    if(it.pick && (it.pick==='wear' || has(it.pick))) it.bag = it.pick;
+    else if(it.where==='wear') it.bag = 'wear';
+    else if(it.where==='valuable') it.bag = has('under') ? 'under' : has('cabin') ? 'cabin' : 'wear';
+    else if(it.where==='hand') it.bag = has('cabin') ? 'cabin' : has('under') ? 'under' : main;
+    else if(it.where==='liquid') it.bag = main;
+    else it.bag = main;
+  }
+  const sum = k => { const b = bags.find(x=>x.k===k); return b ? b.tare + items.filter(i=>i.bag===k).reduce((a,i)=>a+i.qty*i.kg,0) : 0; };
+  const cabin = bags.find(b=>b.k==='cabin');
+  if(!has('hold') && cabin && has('under')){
+    const movable = items.filter(i=>i.bag==='cabin' && i.where==='any' && !i.pick).sort((a,b)=>a.qty*a.kg-b.qty*b.kg);
+    for(const it of movable){ if(sum('cabin') <= cabin.limit) break; if(sum('under') + it.qty*it.kg > (t.ul||5)) continue; it.bag='under'; }
+  }
+  return bags;
+}
+
+/* ---------- Render ---------- */
+function rebuild(){
+  if(!state.trip) return;
+  state.items = buildList(state.trip, state.band, state.rain);
+  state.bags = allocate(state.items, state.trip);
+  renderImpact();
+  renderBags();
+  renderList();
+  renderNoPack();
+  renderShop();
+  renderDeparture();
+  updateProgress();
+}
+
+function bagWeights(b){
+  const mine = state.items.filter(i=>i.bag===b.k);
+  return { total: b.tare + mine.reduce((a,i)=>a+i.qty*i.kg,0), packed: b.tare + mine.filter(i=>state.ticks[i.id]).reduce((a,i)=>a+i.qty*i.kg,0), left: mine.filter(i=>!state.ticks[i.id]).length, count: mine.length };
+}
+function renderBags(){
+  const kids = [], overBags = [];
+  for(const b of state.bags){
+    const w = bagWeights(b);
+    const over = b.limit && w.total > b.limit;
+    if(over) overBags.push(b);
+    const scale = b.limit ? Math.max(b.limit, w.total) : Math.max(8, w.total);
+    const bar = el('div',{className:'bar',role:'img'});
+    bar.setAttribute('aria-label',`${b.name}: ${w.packed.toFixed(1)} kg packed, ${w.total.toFixed(1)} kg once everything's in${b.limit?', limit '+b.limit+' kg':''}`);
+    bar.append(el('i',{className:'plan',style:`width:${w.total/scale*100}%`}), el('i',{className:'packed',style:`width:${w.packed/scale*100}%`}));
+    if(over) bar.append(el('i',{style:`left:${b.limit/scale*100}%;width:0;border-left:2px dashed var(--ink)`}));
+    const sub = w.left ? `${w.total.toFixed(1)} kg once the last ${w.left} item${w.left>1?'s are':' is'} in` : (w.count ? "Everything's in" : 'Nothing going in this bag');
+    kids.push(el('div',{className:'bag'+(over?' over':'')},[
+      el('div',{className:'bag-top'},[el('span',{className:'bag-name',textContent:b.name}), el('span',{className:'bag-kg'},[el('b',{textContent:w.packed.toFixed(1)}), b.limit ? ` of ${b.limit} kg packed` : ' kg packed'])]),
+      bar,
+      el('div',{className:'bag-sub',textContent: sub + (over ? `, ${(w.total-b.limit).toFixed(1)} kg over` : b.limit ? `, ${(b.limit-w.total).toFixed(1)} kg spare` : '')}),
+      !b.limit ? el('p',{className:'fine',style:'margin-top:4px',textContent:"Most airlines don't weigh this, but some count it towards your cabin allowance."}) : null
+    ]));
+  }
+  const worn = state.items.filter(i=>i.bag==='wear' && i.where!=='valuable');
+  if(worn.length) kids.push(el('p',{className:'fine',textContent:'Wear on the plane: ' + worn.map(i=>i.name.toLowerCase()).join(', ') + ". That's about " + worn.reduce((a,i)=>a+i.qty*i.kg,0).toFixed(1) + " kg you're not carrying."}));
+  if(overBags.length){
+    const keys = new Set(overBags.map(b=>b.k));
+    const heavy = state.items.filter(i=>keys.has(i.bag)).sort((a,b)=>b.qty*b.kg-a.qty*a.kg).slice(0,3);
+    kids.push(el('div',{className:'tips'},[
+      el('strong',{textContent: overBags.map(b=>b.name).join(' and ') + ' looks over the limit. '}),
+      document.createTextNode(state.trip.laundry ? 'The heaviest things in there:' : 'Ticking "I can wash clothes" cuts repeats. The heaviest things in there:'),
+      el('ul',{},heavy.map(i=>el('li',{textContent:`${i.name} (${i.qty>1 ? i.qty+' × ' : ''}${i.kg} kg)`})))
+    ]));
+  }
+  if(state.items.some(i=>i.where==='liquid' && (i.bag==='cabin'||i.bag==='under'))) kids.push(el('p',{className:'fine',textContent:'Liquids in hand luggage: 100 ml max per bottle, all in one clear bag. Some UK airports allow more, so check yours.'}));
+  $('#bags').replaceChildren(...kids);
+}
+
+const WHERE = {hold:['Suitcase','w-hold'],cabin:['Cabin bag','w-cabin'],under:['Personal item','w-under'],wear:['Wear','w-wear']};
+const whereLabel = it => it.bag==='wear' && it.where==='valuable' ? 'On you' : (WHERE[it.bag]||WHERE.wear)[0];
+let idn = 0;
+function itemRow(it){
+  const done = !!state.ticks[it.id];
+  const cid = 'c' + (++idn);
+  const cb = el('input',{type:'checkbox',checked:done,id:cid});
+  const li = el('li',{className:done?'done':''});
+  cb.onchange = () => { setTick(it.id, cb.checked); li.classList.toggle('done', cb.checked); renderBags(); renderDeparture(); updateProgress(); };
+  const nameKids = [it.count ? it.name : (it.qty>1 ? `${it.name} × ${it.qty}` : it.name)];
+  if(it.essential) nameKids.push(el('span',{className:'ess',textContent:'Essential'}));
+  const meta = el('div',{className:'meta'});
+  if(it.count){
+    const out = el('output',{textContent:it.qty});
+    const mk = (sym, dlt, lbl) => { const b = el('button',{type:'button',textContent:sym}); b.setAttribute('aria-label', `${lbl} ${it.name}`); b.dataset.step = it.id + dlt; b.onclick = () => stepQty(it, dlt); return b; };
+    meta.append(el('span',{className:'step'},[mk('−',-1,'Fewer'), out, mk('+',1,'More')]));
+  }
+  const [, wc] = WHERE[it.bag] || WHERE.wear;
+  meta.append(el('span',{className:'where '+wc,textContent:whereLabel(it)}));
+  const buy = el('button',{type:'button',className:'buy',textContent: state.buy[it.id] ? '🛒 On shopping list' : '🛒 Need to buy'});
+  buy.setAttribute('aria-pressed', !!state.buy[it.id]);
+  buy.onclick = () => { if(state.buy[it.id]) delete state.buy[it.id]; else state.buy[it.id] = 1; store.set(state.key+':buy', state.buy); buy.setAttribute('aria-pressed', !!state.buy[it.id]); buy.textContent = state.buy[it.id] ? '🛒 On shopping list' : '🛒 Need to buy'; renderShop(); };
+  meta.append(buy);
+  const noteTxt = it.count && it.why ? (it.auto != null && it.auto !== it.qty ? `You changed this from ${it.auto}` : it.why) : it.note;
+  const rm = el('button',{type:'button',className:'rm',textContent:'×',title:'Remove'});
+  rm.setAttribute('aria-label','Remove ' + it.name);
+  rm.onclick = () => removeItem(it);
+  li.append(cb, el('div',{className:'it'},[
+    el('label',{htmlFor:cid,className:'nm'},nameKids),
+    noteTxt ? el('div',{className:'nt',textContent:noteTxt}) : null,
+    it.count && it.why && it.note ? el('div',{className:'nt',textContent:it.note}) : null,
+    meta
+  ]), rm);
+  return li;
+}
+function renderList(){
+  idn = 0;
+  const groups = new Map();
+  if(state.view === 'bag'){
+    const order = ['wear','under','cabin','hold'];
+    const title = {wear:'Wear or keep on you',under:'Personal item',cabin:'Cabin bag',hold:'Checked suitcase'};
+    for(const k of order){ const l = state.items.filter(i=>i.bag===k); if(l.length) groups.set(title[k], l); }
+  } else {
+    for(const it of state.items){ if(!groups.has(it.cat)) groups.set(it.cat,[]); groups.get(it.cat).push(it); }
+  }
+  const kids = [];
+  for(const [cat,list] of groups){
+    kids.push(el('h3',{textContent:cat}));
+    kids.push(el('ul',{className:'items'}, list.map(itemRow)));
+  }
+  const active = document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.step : null;
+  $('#list').replaceChildren(...kids);
+  if(active){ const b = [...document.querySelectorAll('[data-step]')].find(x=>x.dataset.step===active); if(b) b.focus(); }
+  const n = Object.keys(state.removed).length, rb = $('#restoreBtn');
+  rb.classList.toggle('hidden', !n);
+  rb.textContent = `Bring back ${n} removed item${n>1?'s':''}`;
+  $('#byCat').setAttribute('aria-pressed', state.view!=='bag');
+  $('#byBag').setAttribute('aria-pressed', state.view==='bag');
+}
+function stepQty(it, dlt){
+  const n = Math.max(1, Math.min(30, it.qty + dlt));
+  if(n === it.qty) return;
+  if(it.custom){ const cu = state.custom.find(x=>x.id===it.custom); if(cu){ cu.qty = n; store.set(state.key+':custom', state.custom); } }
+  else { if(it.auto != null && n === it.auto) delete state.qty[it.id]; else state.qty[it.id] = n; store.set(state.key+':qty', state.qty); }
+  rebuild();
+}
+function setTick(id, on){ if(on) state.ticks[id]=1; else delete state.ticks[id]; store.set(state.key, state.ticks); }
+$('#byCat').onclick = () => { state.view='cat'; store.set('packpal:view','cat'); renderList(); };
+$('#byBag').onclick = () => { state.view='bag'; store.set('packpal:view','bag'); renderList(); };
+
+function renderNoPack(){
+  const l = dontPack(state.trip);
+  $('#noCard').classList.toggle('hidden', !l.length);
+  $('#noList').replaceChildren(...l.map(([n,w]) => el('li',{},[el('span',{className:'x',textContent:'✕','aria-hidden':'true'}), el('div',{},[el('b',{textContent:n}), el('span',{textContent:w})])])));
+}
+function renderShop(){
+  const l = state.items.filter(i=>state.buy[i.id]);
+  $('#shopEmpty').classList.toggle('hidden', !!l.length);
+  $('#shopActions').classList.toggle('hidden', !l.length);
+  $('#shopList').replaceChildren(...l.map((it,n) => {
+    const id = 's'+n, got = !!state.bought[it.id];
+    const cb = el('input',{type:'checkbox',id,checked:got});
+    const li = el('li',{className:got?'done':''},[cb, el('div',{className:'it'},[el('label',{htmlFor:id,className:'nm',textContent: it.qty>1 ? `${it.name} × ${it.qty}` : it.name}), el('div',{className:'nt',textContent: got ? 'Bought' : 'Still to buy'})])]);
+    cb.onchange = () => { if(cb.checked) state.bought[it.id]=1; else delete state.bought[it.id]; store.set(state.key+':bought', state.bought); li.classList.toggle('done',cb.checked); li.querySelector('.nt').textContent = cb.checked ? 'Bought' : 'Still to buy'; };
+    return li;
+  }));
+}
+function homeJobs(){
+  const w = state.wx;
+  return (w && w.cc && w.cc !== 'GB' && w.country ? [`Check entry requirements for ${w.country} on GOV.UK`] : []).concat(HOME_JOBS);
+}
+function homeRows(target){
+  return homeJobs().map((job, n) => {
+    const id = target+'-h'+n, on = !!state.home[job];
+    const cb = el('input',{type:'checkbox',id,checked:on});
+    const li = el('li',{className:on?'done':''},[cb, el('div',{className:'it'},[el('label',{htmlFor:id,className:'nm',textContent:job})])]);
+    cb.onchange = () => { if(cb.checked) state.home[job]=1; else delete state.home[job]; store.set(state.key+':day', state.home); li.classList.toggle('done', cb.checked); };
+    return li;
+  });
+}
+function renderDeparture(){
+  const ess = state.items.filter(i=>i.essential);
+  $('#essList').replaceChildren(...ess.map(it => {
+    const on = !!state.ticks[it.id];
+    const b = el('button',{type:'button'},[el('span',{className:'dot ' + (on?'g':'r')}), el('span',{className:'t',textContent:it.name})]);
+    b.setAttribute('aria-pressed', on);
+    b.onclick = () => { setTick(it.id, !state.ticks[it.id]); renderList(); renderBags(); renderDeparture(); updateProgress(); };
+    return el('li',{},b);
+  }));
+  $('#homeList').replaceChildren(...homeRows('p'));
+}
+function updateProgress(){
+  const total = state.items.length, done = state.items.filter(i=>state.ticks[i.id]).length;
+  const missing = state.items.filter(i=>i.essential && !state.ticks[i.id]).length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  $('#progTitle').textContent = (state.wx && state.wx.place ? state.wx.place : state.trip.dest).split(',')[0];
+  $('#pct').textContent = pct + '%';
+  $('#stDest').textContent = $('#progTitle').textContent; $('#stPct').textContent = pct + '%'; $('#stBar').style.width = pct + '%';
+  $('#printTitle').textContent = `${state.trip.dest}, ${fmtShort(state.trip.from)} to ${fmtShort(state.trip.to)}`;
+  $('#counts').replaceChildren(
+    el('span',{},[el('i',{className:'dot g'}), `${done} packed`]),
+    el('span',{},[el('i',{className:'dot y'}), `${total-done} remaining`]),
+    el('span',{},[el('i',{className:'dot r'}), missing ? `${missing} essential${missing>1?'s':''} missing` : 'No essentials missing'])
+  );
+  const groups = new Map();
+  for(const it of state.items){ if(!groups.has(it.cat)) groups.set(it.cat,[0,0]); const g = groups.get(it.cat); g[1]++; if(state.ticks[it.id]) g[0]++; }
+  $('#catBars').replaceChildren(...[...groups].map(([cat,[d,t]]) => {
+    const p = Math.round(d/t*100);
+    return el('div',{className:'catbar'},[el('span',{className:'nm',textContent:cat}), el('div',{className:'track'},el('i',{className: p===100?'full':'',style:`width:${p}%`})), el('span',{className:'pc',textContent:p+'%'})]);
+  }));
+  saveTrip();
+}
+
+/* ---------- Item actions ---------- */
+function removeItem(it){
+  if(it.custom){ state.custom = state.custom.filter(c=>c.id!==it.custom); store.set(state.key+':custom', state.custom); }
+  else { state.removed[it.id] = 1; store.set(state.key+':removed', state.removed); }
+  delete state.ticks[it.id]; store.set(state.key, state.ticks);
+  rebuild();
+}
+$('#restoreBtn').onclick = () => { state.removed = {}; store.set(state.key+':removed', {}); rebuild(); };
+$('#addForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#newName').value.trim(), err = $('#addErr');
+  if(!name){ err.textContent = 'Add a name for the item.'; err.classList.remove('hidden'); $('#newName').focus(); return; }
+  err.classList.add('hidden');
+  const qty = Math.max(1, Math.min(30, parseInt($('#newQty').value,10) || 1));
+  state.custom.push({id: Date.now().toString(36), name, qty, kg: +$('#newKg').value, bag: $('#newBag').value});
+  store.set(state.key+':custom', state.custom);
+  $('#newName').value = ''; $('#newQty').value = 1;
+  rebuild(); $('#newName').focus();
+});
+$('#resetTicks').onclick = () => { state.ticks = {}; store.set(state.key,{}); rebuild(); };
+async function copyText(btn, text, label){
+  try { await navigator.clipboard.writeText(text); btn.textContent='Copied'; }
+  catch(e){ btn.textContent="Copy isn't available here"; }
+  setTimeout(()=>btn.textContent=label,2000);
+}
+$('#copyBtn').onclick = () => {
+  const t = state.trip; const lines = [`PackPal: ${t.dest}, ${fmtShort(t.from)} to ${fmtShort(t.to)}`];
+  let cat=null;
+  for(const i of state.items){ if(i.cat!==cat){ cat=i.cat; lines.push('', cat); } lines.push(`${state.ticks[i.id]?'[x]':'[ ]'} ${i.name}${i.qty>1?' × '+i.qty:''} (${whereLabel(i)})`); }
+  copyText($('#copyBtn'), lines.join('\n'), 'Copy list');
+};
+$('#copyShop').onclick = () => {
+  const l = state.items.filter(i=>state.buy[i.id]);
+  copyText($('#copyShop'), ['Shopping for ' + state.trip.dest, ...l.map(i=>`${state.bought[i.id]?'[x]':'[ ]'} ${i.name}${i.qty>1?' × '+i.qty:''}`)].join('\n'), 'Copy shopping list');
+};
+
+/* ---------- Views & trips ---------- */
+const fmtShort = d => new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+const fmtLong = d => new Date(d+'T12:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+function scrollToResults(){ $('#results').scrollIntoView({behavior: reduced()?'auto':'smooth', block:'start'}); }
+function showView(v){
+  const done = v === 'done';
+  $('#trip').classList.toggle('hidden', done);
+  $('#results').classList.toggle('hidden', done || !state.trip);
+  $('#done').classList.toggle('hidden', !done);
+  renderTrips();
+}
+function getTrips(){ const l = store.get('packpal:trips'); return Array.isArray(l) ? l : []; }
+function saveTrip(extra){
+  if(!state.trip || !state.key) return;
+  const list = getTrips();
+  let rec = list.find(r => r.key === state.key);
+  if(!rec){ rec = {key: state.key}; list.unshift(rec); }
+  Object.assign(rec, {t: state.trip, wx: state.wx, band: state.band, rain: state.rain, bandManual: !!state.bandManual, updated: Date.now(),
+    total: state.items.length, done: state.items.filter(i => state.ticks[i.id]).length}, extra || {});
+  store.set('packpal:trips', list.slice(0, 20));
+  renderTrips();
+}
+function renderTrips(){
+  const list = getTrips();
+  $('#tripsBox').classList.toggle('hidden', !list.length || !$('#done').classList.contains('hidden'));
+  $('#tripList').replaceChildren(...list.map(r => {
+    const status = r.finished ? el('span',{className:'ok',textContent:'Packed'}) : el('span',{textContent: r.total ? `${Math.round(r.done/r.total*100)}% packed` : 'Not started'});
+    const open = el('button',{type:'button',className:'trip-open'},[
+      el('b',{textContent: r.t.dest}), el('span',{textContent: `${fmtShort(r.t.from)} to ${fmtShort(r.t.to)}, `}), status
+    ]);
+    open.setAttribute('aria-current', r.key === state.key);
+    open.onclick = () => openTrip(r.key);
+    const del = el('button',{type:'button',className:'trip-del',textContent:'×'});
+    del.setAttribute('aria-label','Delete trip to ' + r.t.dest);
+    del.onclick = () => {
+      if(!del.classList.contains('arm')){ del.classList.add('arm'); del.textContent = 'Delete'; setTimeout(() => { del.classList.remove('arm'); del.textContent = '×'; }, 3000); return; }
+      deleteTrip(r.key);
+    };
+    return el('div',{className:'trip-row'},[open, del]);
+  }));
+}
+function loadTripData(){
+  const k = state.key;
+  state.ticks = store.get(k) || {};
+  state.removed = store.get(k+':removed') || {};
+  state.custom = store.get(k+':custom') || [];
+  state.qty = store.get(k+':qty') || {};
+  state.buy = store.get(k+':buy') || {};
+  state.bought = store.get(k+':bought') || {};
+  const h = store.get(k+':day'); state.home = h && !Array.isArray(h) ? h : {};
+}
+function openTrip(key, quiet){
+  const r = getTrips().find(x => x.key === key); if(!r) return;
+  fillForm(r.t);
+  state.trip = r.t; state.key = key; loadTripData();
+  state.wx = r.wx && r.wx.at ? r.wx : null; state.band = r.band || 'warm'; state.rain = !!r.rain; state.bandManual = !!r.bandManual;
+  if(state.wx) renderWeather(); else showWxFallback();
+  hideForget(); syncBands(); showView('plan'); rebuild();
+  if(!quiet) scrollToResults();
+  if(isStale(state.wx)) refreshWeather();
+}
+function deleteTrip(key){
+  store.set('packpal:trips', getTrips().filter(r => r.key !== key));
+  for(const s of ['',':removed',':custom',':day',':qty',':buy',':bought']) store.del(key+s);
+  if(state.key === key) newTrip(); else renderTrips();
+}
+function newTrip(){
+  state.trip = null; state.key = null; state.items = [];
+  fillForm({acts: ['beach','pool'], hold: +$('#hold').value, cabin: +$('#cabin').value, under: $('#under').checked, laundry: false, airline: airSel.value});
+  hideForget(); showView('plan');
+  $('#trip').scrollIntoView({block:'start'}); $('#dest').focus();
+}
+$('#newTrip').onclick = newTrip;
+
+/* ---------- What am I forgetting? + complete page ---------- */
+function hideForget(){ $('#forget').classList.add('hidden'); }
+$('#finishBtn').onclick = () => {
+  const missing = state.items.filter(i => i.essential && !state.ticks[i.id]);
+  if(!missing.length) return showDone();
+  $('#forgetList').replaceChildren(...missing.map(i => el('li',{textContent:'⚠️ ' + i.name})));
+  $('#forget').classList.remove('hidden');
+  $('#forget').scrollIntoView({behavior: reduced()?'auto':'smooth', block:'nearest'});
+};
+$('#forgetPacked').onclick = () => {
+  for(const i of state.items) if(i.essential) state.ticks[i.id] = 1;
+  store.set(state.key, state.ticks); showDone();
+};
+$('#forgetGo').onclick = showDone;
+
+function showDone(){
+  const t = state.trip; if(!t) return;
+  hideForget(); rebuild();
+  saveTrip({finished: Date.now()});
+  const place = ((state.wx && state.wx.place) || t.dest).split(',')[0];
+  $('#doneTitle').textContent = `All packed for ${place}`;
+  $('#stampDate').textContent = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}).toUpperCase();
+  const today0 = new Date(); today0.setHours(0,0,0,0);
+  const days = Math.round((new Date(t.from+'T00:00:00') - today0) / 864e5);
+  $('#doneWhen').textContent = days > 1 ? `You fly out on ${fmtLong(t.from)}, ${days} days from now.`
+    : days === 1 ? 'You fly out tomorrow.' : days === 0 ? 'You fly out today. Have a brilliant trip.' : `Your trip started on ${fmtLong(t.from)}.`;
+  $('#doneWx').textContent = state.wx && state.wx.summary ? state.wx.summary : '';
+  $('#doneBags').replaceChildren(...state.bags.map(b => {
+    const w = bagWeights(b); const over = b.limit && w.packed > b.limit;
+    return el('div',{className:'dbag'},[
+      el('div',{},[el('b',{textContent:b.name}), el('div',{className:'kg',textContent: b.limit ? `About ${w.packed.toFixed(1)} of ${b.limit} kg` : `About ${w.packed.toFixed(1)} kg`})]),
+      el('span',{className:'st' + (over ? ' over' : ''), textContent: over ? `${(w.packed-b.limit).toFixed(1)} kg over` : b.limit ? `${(b.limit-w.packed).toFixed(1)} kg spare` : 'No set limit'})
+    ]);
+  }));
+  const left = state.items.filter(i => !state.ticks[i.id]);
+  $('#doneLeft').replaceChildren(...(left.length ? [el('p',{className:'basis',textContent:
+    `Not ticked off: ${left.map(i => i.name.toLowerCase()).join(', ')}. Fine if you've left ${left.length > 1 ? 'them' : 'it'} out on purpose.`})] : []));
+  const toBuy = state.items.filter(i => state.buy[i.id] && !state.bought[i.id]);
+  $('#doneShop').replaceChildren(...(toBuy.length ? [el('p',{className:'basis',textContent:`Still to buy: ${toBuy.map(i=>i.name.toLowerCase()).join(', ')}.`})] : []));
+  $('#doneHome').replaceChildren(...homeRows('d'));
+  $('#sticky').classList.remove('show');
+  showView('done');
+  const st = $('#stamp'); st.style.animation = 'none'; void st.offsetWidth; st.style.animation = '';
+  window.scrollTo(0, 0);
+}
+$('#backBtn').onclick = () => { showView('plan'); rebuild(); scrollToResults(); };
+$('#anotherBtn').onclick = newTrip;
+
+$('#printBtn').onclick = () => window.print();
+if('IntersectionObserver' in window){
+  const io = new IntersectionObserver(([e]) => {
+    const show = !e.isIntersecting && e.boundingClientRect.top < 0 && !$('#results').classList.contains('hidden');
+    $('#sticky').classList.toggle('show', show);
+  });
+  io.observe($('#progCard'));
+}
+
+/* ---------- Start ---------- */
+const trips = getTrips();
+if(trips.length) openTrip(trips[0].key, true); else renderTrips();
+})();
+</script>
+</body>
+</html>
